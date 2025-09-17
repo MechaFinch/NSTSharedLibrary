@@ -22,16 +22,6 @@ public class ASTLogger {
     }
     
     /**
-     * @param node
-     * @return
-     */
-    private String getSourceInfoString(ASTNode node) {
-        TextPosition pos = ASTUtil.getPosition(node);
-         
-        return "(" + pos.getLine() + ":" + pos.getColumn() + "): ";
-    }
-    
-    /**
      * General log
      * @param level
      * @param node
@@ -39,7 +29,7 @@ public class ASTLogger {
      */
     public void log(Level level, ASTNode node, String message) {
         if(this.log.isLoggable(level)) {
-            this.log.log(level, getSourceInfoString(node) + message);
+            this.log.log(level, ASTUtil.getSourceInfoString(node) + ": " + message);
         }
     }
     
@@ -49,7 +39,7 @@ public class ASTLogger {
      * @param message
      */
     public void severe(ASTNode node, String message) {
-        this.log.severe(getSourceInfoString(node) + message);
+        this.log.severe(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
     
     /**
@@ -58,7 +48,7 @@ public class ASTLogger {
      * @param message
      */
     public void warning(ASTNode node, String message) {
-        this.log.warning(getSourceInfoString(node) + message);
+        this.log.warning(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
     
     /**
@@ -67,7 +57,7 @@ public class ASTLogger {
      * @param message
      */
     public void info(ASTNode node, String message) {
-        this.log.info(getSourceInfoString(node) + message);
+        this.log.info(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
     
     /**
@@ -76,7 +66,7 @@ public class ASTLogger {
      * @param message
      */
     public void fine(ASTNode node, String message) {
-        this.log.fine(getSourceInfoString(node) + message);
+        this.log.fine(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
     
     /**
@@ -85,7 +75,7 @@ public class ASTLogger {
      * @param message
      */
     public void finer(ASTNode node, String message) {
-        this.log.finer(getSourceInfoString(node) + message);
+        this.log.finer(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
     
     /**
@@ -94,6 +84,6 @@ public class ASTLogger {
      * @param message
      */
     public void finest(ASTNode node, String message) {
-        this.log.finest(getSourceInfoString(node) + message);
+        this.log.finest(ASTUtil.getSourceInfoString(node) + ": " + message);
     }
 }
