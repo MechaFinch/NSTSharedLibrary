@@ -2,7 +2,11 @@ package notsotiny.lib.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +38,10 @@ public class TreeNode<T> {
      */
     public void addChild(TreeNode<T> child) {
         child.parent = this;
-        this.children.add(child);
+        
+        if(child != this) {
+            this.children.add(child);
+        }
     }
     
     public void setParent(TreeNode<T> parent) {
@@ -54,6 +61,52 @@ public class TreeNode<T> {
         
         for(TreeNode<T> child : children) {
             addChild(child);
+        }
+    }
+    
+    /**
+     * Constructs a map from an element to the node containing the element
+     * @return
+     */
+    public Map<T, TreeNode<T>> getElementNodeMap() {
+        Map<T, TreeNode<T>> map = new HashMap<>();
+        
+        contributeToMap(map);
+        
+        return map;
+    }
+    
+    /**
+     * Constructs a set of all elements contained in this node and its children
+     * @return
+     */
+    public Set<T> getAllElements() {
+        Set<T> set = new HashSet<>();
+        contributeToSet(set);
+        return set;
+    }
+    
+    /**
+     * Contribute this node's element and those of its children to the set
+     * @param set
+     */
+    private void contributeToSet(Set<T> set) {
+        set.add(this.element);
+        
+        for(TreeNode<T> child : this.children) {
+            child.contributeToSet(set);
+        }
+    }
+    
+    /**
+     * Contribute this node and its children to an element-node map
+     * @param map
+     */
+    private void contributeToMap(Map<T, TreeNode<T>> map) {
+        map.put(this.element, this);
+        
+        for(TreeNode<T> child : this.children) {
+            child.contributeToMap(map);
         }
     }
     
@@ -97,7 +150,7 @@ public class TreeNode<T> {
      * @param log
      * @param depth
      */
-    private void logTree(Logger log, Level level, TreeNode<T> node, boolean[] crossings) {
+    private static <T> void logTree(Logger log, Level level, TreeNode<T> node, boolean[] crossings) {
         StringBuilder sb = new StringBuilder();
         
         for(int i = 0; i < crossings.length - 1; i++) {

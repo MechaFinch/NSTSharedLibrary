@@ -5,11 +5,60 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import notsotiny.lib.data.TreeNode;
+
 public class MapUtil {
+    
     /**
-     * Get the given map, or create it
+     * Converts a map from child to parent to a forest of trees
+     * @param <K>
+     * @param map
+     * @return A map from element to containing tree node
+     */
+    public static <K> Map<K, TreeNode<K>> mapToForest(Map<K, K> map) {
+        // Make a tree node for each child and parent
+        Map<K, TreeNode<K>> nodeMap = new HashMap<>();
+        
+        for(K key : map.keySet()) {
+            nodeMap.putIfAbsent(key, new TreeNode<>(key));
+        }
+        
+        for(K value : map.values()) {
+            nodeMap.putIfAbsent(value, new TreeNode<>(value));
+        }
+        
+        // Populate tree edges
+        for(Entry<K, K> entry : map.entrySet()) {
+            K childValue = entry.getKey();
+            K parentValue = entry.getValue();
+            
+            nodeMap.get(parentValue).addChild(nodeMap.get(childValue));
+        }
+        
+        return nodeMap;
+    }
+    
+    /**
+     * Converts a list to a map from element to index
+     * @param <K>
+     * @param list
+     * @return
+     */
+    public static <K> Map<K, Integer> listToMap(List<K> list) {
+        Map<K, Integer> map = new HashMap<>();
+        
+        for(int i = 0; i < list.size(); i++) {
+            map.put(list.get(i), i);
+        }
+        
+        return map;
+    }
+    
+    /**
+     * Get the given map, or create it and add it to the map
      * @param <K1>
      * @param <K2>
      * @param <V>
@@ -28,7 +77,7 @@ public class MapUtil {
     }
     
     /**
-     * Get the given list, or create it
+     * Get the given list, or create it and add it to the map
      * @param <K>
      * @param <V>
      * @param map
@@ -46,7 +95,7 @@ public class MapUtil {
     }
     
     /**
-     * Get the given set, or create it
+     * Get the given set, or create it and add it to the map
      * @param <K>
      * @param <V>
      * @param map

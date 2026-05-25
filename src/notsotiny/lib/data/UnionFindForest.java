@@ -9,8 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An implementation of the UNION-FIND data structure
- * Contains a forest of trees where each tree's root is the representative of its equivalence class
+ * An implementation of the UNION-FIND data structure which maintains both path-compressed and uncompressed representation
+ * Contains a forest of trees where each tree's root is the representative of its equivalence class.
+ * 
+ * The uncompressed representation is maintained by the TreeNodes making up the trees in the forest.
+ * The path-compressed representation is maintained by a compressed-parent map.
  */
 public class UnionFindForest<T> {
     
@@ -20,12 +23,16 @@ public class UnionFindForest<T> {
     // Maps elements to their nodes
     private Map<T, TreeNode<T>> elementNodeMap;
     
+    // Maps elements to their compressed parents
+    private Map<T, T> compressedParentMap;
+    
     /**
      * Creates a UNION-FIND data structure
      */
     public UnionFindForest() {
         this.representatives = new ArrayList<>();
         this.elementNodeMap = new HashMap<>();
+        this.compressedParentMap = new HashMap<>();
     }
     
     /**
@@ -40,8 +47,9 @@ public class UnionFindForest<T> {
         
         // No, add it.
         TreeNode<T> node = new TreeNode<>(element);
-        representatives.add(node);
-        elementNodeMap.put(element, node);
+        this.representatives.add(node);
+        this.elementNodeMap.put(element, node);
+        this.compressedParentMap.put(element, element);
     }
     
     /**
@@ -51,10 +59,25 @@ public class UnionFindForest<T> {
      */
     public T findElement(T element) {
         // Find
-        TreeNode<T> node = findNode(element);
+        T compressedParent = this.compressedParentMap.get(element);
         
-        // Return element
-        return node.getElement();
+        if(!compressedParent.equals(element)) {
+            // Compress if appropriate
+            T newParent = findElement(compressedParent);
+            this.compressedParentMap.put(element, newParent);
+            return newParent;
+        } else {
+            return element;
+        }
+    }
+    
+    /**
+     * Performs FIND(node), returning the representative element
+     * @param node
+     * @return
+     */
+    public T findElement(TreeNode<T> node) {
+        return findElement(node.getElement());
     }
     
     /**
@@ -63,8 +86,8 @@ public class UnionFindForest<T> {
      * @return
      */
     public TreeNode<T> findNode(T element) {
-        // Get leaf, find representative
-        return findNode(this.elementNodeMap.get(element));
+        // Get representative via path compression, then get node for element
+        return this.elementNodeMap.get(findElement(element));
     }
     
     /**
@@ -73,12 +96,8 @@ public class UnionFindForest<T> {
      * @return
      */
     public TreeNode<T> findNode(TreeNode<T> node) {
-        // Is it the representative
-        if(node.getParent() == null || node.getParent() == node) {
-            return node;
-        } else {
-            return findNode(node.getParent());
-        }
+        // Get representative via path compression
+        return findNode(node.getElement());
     }
     
     /**
@@ -102,6 +121,7 @@ public class UnionFindForest<T> {
         
         // Make the representative of A the parent of the representative of B
         repB.setParent(repA);
+        this.compressedParentMap.put(repB.getElement(), repA.getElement());
         this.representatives.remove(repB);
     }
     
